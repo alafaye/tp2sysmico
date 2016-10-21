@@ -222,7 +222,7 @@ char SCH_Delete_Task(const uint8_t TASK_INDEX)
     else
     {
         Return_code = RETURN_NORMAL;
-    }      
+    }
 
     SCH_tasks_G[TASK_INDEX].pTask   = 0x0000;
     SCH_tasks_G[TASK_INDEX].Delay   = 0;

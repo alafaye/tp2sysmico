@@ -7,56 +7,54 @@
 
 unsigned int tick_led;
 
-void setup_AD(void){
+//Transform factor between 91 and 255
+#define TRANSFORM_FACTOR 2.8
+// define to the pot val between 0-255
+#define VAL_POT ADC12MEM0
 
+// define the rows of the palette
+// on three rows
+# define row_1 3
+# define row_2 4
+# define row_3 5
 
+// lenght of the palette
+#define lenght 10
+
+void init_AD(void){
+    P6SEL = 0x0F; // Enable A/D Channel inputs
+    //ADC12 is on + multiple sample and convert
+    ADC12CTL0 = ADC12ON+ADC12MSC+ADC12SHT0_8; 
+    ADC12CTL1 = ADC12SHP+ADC12CONSEQ_3;
+    // Channel A5
+    ADC12MCTL5 = ADC12INCH_5 + ADC12EOS; 
+    // Enable encoder
+    ADC12CTL0 |= ADC12ENC;
+    // Start software trigger
+    ADC12CTL0 |= ADC12SC; 
 }
 
-// To setup clock to freq indicated at the end of the func.
-void setup_clk(void) {
-    P1OUT |= BIT2;
-    // Target Freq for SMCLK, MCLK 3.2Mhz -> 32kHz/8*25*32
-    __disable_interrupt();
-
-    // Choosing XT1 and FLLREFDIV as 8
-    UCSCTL3 = SELREF__XT1CLK + FLLREFDIV__8;
-    // DCORSEL bits to 0
-    UCSCTL1 &= ~(BIT4 | BIT5 | BIT6);
-    // DCORSEL to 4 for 3.2Mhz Target
-    UCSCTL1 |= DCORSEL_4;
-    // FLLN set to 25 and FLLD to 32.
-    UCSCTL2 = FLLD__32 + 24;
-
-    // Set all the cloks to DCO ref
-    UCSCTL4 = SELA__DCOCLK + SELM__DCOCLK + SELS__DCOCLK;
-
-    // All clks dividers to 1
-    UCSCTL5 = DIVA__1 + DIVM__1 + DIVS__1;
-
-    // freq ACKL 32'768
-    // freq MCLK 3'276'800
-    // freq SMCLK 3'276'800
-
-
-    //__enable_interrupt();
-    P1OUT &= ~BIT2;
+// To power the potentiometer
+void init_pot(void){
+    P8DIR |= BIT0;
+    P8OUT |= BIT0;
 }
 
 //Screen intialisation
-void screen_init(void){
+void init_screen(void){
     Dogs102x6_init();
     Dogs102x6_backlightInit();
     Dogs102x6_setBacklight(3);
     Dogs102x6_setContrast(16);
     Dogs102x6_clearScreen();
-    // Dogs102x6_stringDraw(H_X_POS, H_Y_POS, "00:00:00", 0);
 }
 
 // General setup function
 void init(void){
-    // Screen and clock setup
-    screen_init();
-    setup_clk();
+    // Screen and pot setup
+    init_screen();
+    init_AD();
+    init_pot();
 }
 
 // To make the Led blink following a particuliar pattern
@@ -71,6 +69,20 @@ void blink_led(void){
     }
 }
 
+// Clears the line and draw the palette position
+// Uses VAL_POT, TRANSFORM_FACTOR
+void draw_palette(void){
+    // Clear the lines
+    Dogs102x6_clearRow(row_1);
+    Dogs102x6_clearRow(row_2);
+    Dogs102x6_clearRow(row_3);
+    // put the value of the pot between 0-101
+    int pos_palette = VAL_POT/TRANSFORM_FACTOR;
+    // And draw it
+    Dogs102x6_horizontalLineDraw(pos_palette, pos_palette + lenght, row_1, 0);
+    Dogs102x6_horizontalLineDraw(pos_palette, pos_palette + lenght, row_2, 0);
+    Dogs102x6_horizontalLineDraw(pos_palette, pos_palette + lenght, row_2, 0);
+}
 
 // Main function
 void main(void)
@@ -82,11 +94,13 @@ void main(void)
     //Call init function for some basic setup
     init();
 
+    // Add all the tasks
+    SCH_Add_Task(blink_led, 0, 10);
+    SCH_Add_Task(draw_palette, 0, 10);
+    // SCH_Add_Task(draw_ball, 0, 10);
+
     // Initialisation de l'ordonnanceur
     SCH_Init_T0();
-
-    TA0CTL |= TASSEL_2 + MC_1; // On MCLK up to Max Register Val
-    TA0CCR0 = 32767; // Blink period -> 10ms
 
     // To use clock to drive Led P1.1 through interruptions
     P1DIR |= BIT1;

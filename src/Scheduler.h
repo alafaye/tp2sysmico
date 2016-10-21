@@ -78,7 +78,7 @@ void  SCH_Report_Status(void);
 // during the execution of the program
 //
 // MUST BE ADJUSTED FOR EACH NEW PROJECT
-#define SCH_MAX_TASKS   (10)
+#define SCH_MAX_TASKS   (5)
 
 #define ERROR_SCH_TOO_MANY_TASKS (1)
 #define ERROR_SCH_CANNOT_DELETE_TASK (2)

@@ -84,8 +84,7 @@ void SCH_Init_T0(void)
     // Sets up timer reload values for a tick period of about 1 ms
     TA0CCR0 = 32; // Clk = 32768Hz
 
-    P7SEL |= BIT7;  // To use other P7.7 funcs (MCLK)
-    P7DIR |= BIT7;  // Set P7.7 to out
+    TA0CTL = TACLR | MC_1 | ID_0 | TASSEL_1;   // ACLK, divide by 1, clear, continuous mode
 }
 
 /*------------------------------------------------------------------*-
@@ -121,10 +120,6 @@ void SCH_Start(void)
 __interrupt void SCH_Update(void)
 {
     uint8_t Index;
-
-    // Using the timer to increase values in the chrono and the clock
-    ms+=10;
-    cs+=1;
 
     // NOTE: calculations are in *TICKS* (not milliseconds)
     for (Index = 0; Index < SCH_MAX_TASKS; Index++)
