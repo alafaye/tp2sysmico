@@ -1,0 +1,86 @@
+\subsection{Concept}
+Ce programme utilise un scheduler afin de faciliter la gestion des taches à accomplirlors de son exécution.
+À chaque tache correspond une fonction qui sera ajoutée au scheduler lors de l'Initialisation du microcontroleur avec en paramètre la fréquence à laquelle elles devront eêtre applée ainsi qu'un potentiel offset. L'ordre d'exécution est défini par leur ordre de création. Ensuite une fonction de déléguation de ces tâches va s'assurer de leur exécution.
+
+L'horloge est gérée par la clock ACLK liée au quartz interne de la MSP430. Le timer T0 est ensuite configuré de manière à générer une interuption toutes les 10ms. Ces 10ms définiront le tick de base utilisé pour le scheduler.
+
+\subsection{Dépendances}
+En plus des fichiers fournis, il est nécessaire d'avoir accès à la librairie HAL\_Dogs102x6 afin de pouvoir manipuler l'affichage LCD.
+Les fichiers Scheduler.c, Scheduler.h, SMC\_hal.h ta\_32768.c et ta\_32768.h ont été fournis dans le cadre du cours et été légérement modifiés afin de les adapter au projet.
+
+\subsection{Matériel}
+Ce code a été conçu et testé sur la plate-forme MSP4305529.
+
+Les péripheriques suivants sont utilisés:
+Timer A0, ACLK, LCD Screen, Potentiomètre, bouton S1
+
+\begin{table}[!h]
+    \centering
+    \caption{Périphériques utilisés}
+    \begin{tabular}{|c|c|c||c|}
+		\hline
+		\multicolumn{3}{|c||}{Mesures} & Calculs\\
+		\hline
+	    Tension [V]	&Courant [A] &Champ [mT]& Champ [mT] \\
+		\hline
+		0,1655	&0,250	&0,08	&0,09\\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{Initialisation}
+Tout d'abord afin de permettre l'initialisation correcte du MSP430, il est nécessaire de désactiver le watchdog dans les options du linker de CCS Studio.\\
+Ensuite différentes fonctions d'initialisations sont appelées afin de régler certaines fonctionnalités comme la vitesse de l'horloge et les réactions des timers.
+
+Premierement setup\_clk() qui règle la SMCLK et la MCLK à une fréquence de 3'276'800Hz et laisse inchangée ACLK:
+\lstinputlisting{setup_clk.c}
+
+Ensuite, l'initialisation de l'écran, faite en appelant les fonctions de la librairie HAL\_Dogs102x6:
+\lstinputlisting{screen_init.c}
+
+Et finalement la fonction sobrement nommée init() qui prépare les registres de P1 et P2 et appelle les deux fonctions précédentes:
+\lstinputlisting{init.c}
+
+Toutes ces fonctions sont contenues dans le fichier main.c
+
+L'initialisation de l'unique timer se fait dans le fichier ta\_32768.c avec les fonctions SCH\_Init\_TO et SCH\_Start, qui s'assurent que le tableau des tâches est vide et que l'horloge est accessible. SCH\_Start permettra ensuite d'autoriser les interruptions.
+
+\lstinputlisting{timer_init.c}
+
+Il est aussi à noter que le nombre maximum de tâches autorisées a été augmenté à 10 afin de pouvoir définir les tâches suivantes:
+
+\lstinputlisting{add_task.c}
+
+\subsection{Fonctions et variables}
+Afin d'intéragir correctement avec le scheduler et communiquer avec l'écran l'utilisation de variables globales a été nécessaire. Il est à noter que la fonction permettant d'ajouter des tâches aux scheduler ne permet par contre pas de passer des arguments à ces fonctions. L'utilisation de globales est donc nécessaire dans ce cas.
+
+\lstinputlisting{s1_s2.c}
+
+Tout d'abord ces variables permettent aux deux fonctions check\_S1 et check\_S2 de communiquer à mode\_changer l'état actuel des boutons et s'il s'agit d'une pression longue(plus de 1s)
+
+\lstinputlisting{mode_management.c}
+
+Ensuite, la variable tick\_led permettant de compter le nombre d'appel à la fonction blink\_led et permettant ainsi de donner le comportement souhaité dans le cahier des charges.
+
+\lstinputlisting{blink_led.c}
+
+La variable chrono\_start donnant l'état du chrono, set\_pos indiquant la position de la variable étant modifiée en mode de réglage d'horloge.
+Le mode est par ailleurs stocké dans la variable mode.
+
+Pour gérer l'entier des valeurs nécessaires pour afficher l'horloge et le chrono les variables suivantes sont utilisées:
+
+\lstinputlisting{clock_var.c}
+
+Quand aux trois dernières variables elles stockent les chaînes de charactères à afficher dans chaque mode.
+
+L'horloge et le chrono sont gérées par leur fonctions d'incrémentations respectives:
+
+\lstinputlisting{inc.c}
+
+Ces fonctions sont liées aux variables globles gérant en interne les valeurs de l'horloge et du chrono.
+
+Et finalement, les fonctions liées à la possibilité de régler l'horloge:
+
+\lstinputlisting{set_clk.c}
+
+check\_bound s'occupant de faire en sorte que seules de heures sur 24:60:60 soient représentées, et update\_clock utilisant la variable globale set\_pos afin de savoir quelle est la valeur à modifier et l'incrémentant de 1.

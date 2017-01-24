@@ -1,0 +1,232 @@
+% Nag is used for debug
+\RequirePackage[l2tabu, orthodox]{nag}
+\documentclass[a4paper,french,twoside,10pt]{report}
+%\documentclass[a4paper,twoside,10pt]{article}
+%\usepackage[bookman]{quotchap}
+
+\usepackage[bindingoffset=1.5cm,centering,includeheadfoot,margin=3cm]{geometry}
+
+%\frenchspacing
+\usepackage[frenchb]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[pdftex]{graphicx}
+\usepackage{subfig}
+
+\usepackage[protrusion=true,expansion=true]{microtype}
+
+\usepackage{fancybox}
+\usepackage{shadow}
+\usepackage{xspace}
+\usepackage{acronym}
+
+% Maths enhancing
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{dsfont}
+
+\usepackage{algorithm2e}
+
+% JP : automatic line return after paragraph
+\makeatletter
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+    {-3.25ex\@plus -1ex \@minus -.2ex}%
+    {1.5ex \@plus .2ex}%
+{\normalfont\normalsize\bfseries}}
+\makeatother
+
+% JP : use amsthm package and define some useful commands
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+
+%\usepackage[right]{eurosym}
+\usepackage{lmodern} % new latin extended computer modern font}, use with T1
+%\usepackage{pxfonts} % has replaced palatino
+%\usepackage{cmbright}
+
+\usepackage{listings}
+
+%\usepackage{booktabs}
+%\usepackage{array}
+
+\usepackage[allowlitunits]{siunitx}
+% Try $20\micro\seconds$
+
+%\addtolength{\oddsidemargin}{-1cm}
+%\addtolength{\evensidemargin}{-1cm}
+%\addtolength{\textwidth}{+2cm}
+%\usepackage{showframe}
+
+%\usepackage{lastpage}
+% for \pageref{LastPage}
+
+% fancy header
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+%\pagestyle{plain} % Imprime simplement le numero de page centre en bas
+%\pagestyle{headings}
+\fancyhf{} % clear default header and footer
+
+\fancyhead[LE,RO]{\textit{\nouppercase{\leftmark}}}
+%\fancyhead[LO,RE]{\textit{\nouppercase{\thepage{} of \pageref{LastPage}}}}
+\fancyhead[CE,CO]{}
+\fancyfoot[C]{--\thepage--}
+\setlength{\headheight}{14pt}
+
+\newcommand\Hrule{\noindent\rule{\linewidth}{1.5pt}}
+%\AL: to add abs and norm for fracs
+%\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+%\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
+\usepackage[pdftex,
+    pdfauthor={Alexandre Lafaye},
+    pdftitle={Laboratoire SysMiCo TP2},
+    pdfsubject={},
+    pdfkeywords={rapport,laboratoire,HEIG-VD,SysMiCo,Microcontrolleur},
+pdfcreator=pdflatex]{hyperref}
+\hypersetup{colorlinks, citecolor=black, filecolor=black, linkcolor=black, urlcolor=black}
+
+\newcommand{\weblink}[2]{\href{#1}{\url{#1}: \textsc{#2}}}
+
+%Maths shortcuts
+%\newcommand{\R}{\mathbb{R}}
+%\newcommand{\E}{\mathbb{E}}
+%\newcommand{\N}{\mathbb{N}}
+%\newcommand{\Var}{\mathrm{Var}}
+%\newcommand{\Cov}{\mathrm{Cov}}
+%\newcommand{\Prob}{\mathbb{P}}
+%\newcommand{\trace}{\mathbb{\text{trace}}}
+%\def\mathbi#1{\textbf{\em #1}}
+%%\def\mathi#1{\em #1}
+%\newcommand{\Z}{\mathbi{Z}_2}
+%\newcommand{\kMeans}{{\em k}-Means\xspace}
+%\newcommand{\kmeans}{{\em k}-means\xspace}
+%\newcommand{\kmeanspp}{{\em k}-means$++$\xspace}
+%\newcommand{\captionwidth}{0.9\textwidth}
+
+% index stuff
+\usepackage{tocbibind} % Index in TOC
+%\usepackage{makeidx}
+%\usepackage{showidx} % show index entries in margin
+%\makeindex
+
+%\newcommand{\bib}[4]{\item{\textsc{#1}, \emph{#2}, #3\\\hspace{2em}#4}}
+
+% ---------------------------------------------------------
+
+\newcommand{\titleinfo}{Laboratoire de SysMiCo 2}
+\author{Alexandre Lafaye}
+\date{09 Octobre 2016}
+\title{\titleinfo}
+
+% Margins for handwritten notes
+%\addtolength{\oddsidemargin}{-2cm}
+%\addtolength{\evensidemargin}{-2cm}
+%\addtolength{\textwidth}{-2cm}
+
+\usepackage{color}
+\definecolor{Brown}{cmyk}{0,0.81,1,0.60}
+\definecolor{OliveGreen}{cmyk}{0.64,0,0.95,0.40}
+\definecolor{CadetBlue}{cmyk}{0.62,0.57,0.23,0}
+\definecolor{lightlightgray}{cmyk}{0,0,0,0.02}
+\definecolor{gray}{cmyk}{0,0,0,0.8}
+
+% LaTeX magic: make sections and parts have a cleardoublepage
+%\let\stdsection\section
+%\renewcommand*\section{\cleardoublepage\stdsection}
+\captionsetup{belowskip=12pt,aboveskip=4pt}
+\begin{document}
+% JP
+%\frontmatter
+\lstset{
+  language=C,                % choose the language of the code
+  numbers=left,                   % where to put the line-numbers
+  stepnumber=1,                   % the step between two line-numbers.        
+  numbersep=5pt,                  % how far the line-numbers are from the code
+  backgroundcolor=\color{white},  % choose the background color. You must add \usepackage{color}
+  commentstyle=\color{OliveGreen},    % comment style
+  keywordstyle=\bfseries\color{CadetBlue},
+  showspaces=false,               % show spaces adding particular underscores
+  showstringspaces=false,         % underline spaces within strings
+  showtabs=false,                 % show tabs within strings adding particular underscores
+  tabsize=4,                      % sets default tabsize to 2 spaces
+  captionpos=b,                   % sets the caption-position to bottom
+  breaklines=true,                % sets automatic line breaking
+  breakatwhitespace=true,         % sets if automatic breaks should only happen at whitespace
+  title=\lstname,                 % show the filename of files included with \lstinputlisting;
+}
+\pagestyle{empty}
+\pagenumbering{roman}
+\begin{titlepage}
+    \null\vfil
+    \begin{flushleft}
+	\begin{center}
+	    \Huge \textbf{\titleinfo}
+	\end{center}
+    \end{flushleft}
+    \par
+    \hrule height 4pt
+    \par
+    \begin{flushright}
+	\large
+	\textsl{Rapport de laboratoire} \par
+    \end{flushright}
+    \vspace{\fill}
+    \vspace*{\stretch{1}}
+
+    \begin{center}
+	\Large
+	\textsc{Alexandre Lafaye\\
+	    %\normalsize
+	HEIG-VD -- 2016} \\
+	\href{mailto:alexandre.lafaye@heig-vd.ch}{alexandre.lafaye@heig-vd.ch}
+    \end{center}
+    \vspace{\fill}
+    \vspace*{\stretch{2}}
+    \begin{center}
+	\large
+	Supervisé par: \\
+	\vspace{\fill}
+	Bertrand Hochet -- HEIG-VD\\
+	\href{http://heig-vd.ch/}{http://heig-vd.ch/} \\
+    \end{center}
+
+    \vspace{\fill}
+    \vspace*{\stretch{2}}
+
+    \begin{figure}[!h]
+	\centering
+	\parbox{1.4in}{
+	\includegraphics[height=4em]{logo_heig_h80.jpg}}
+    \end{figure}
+
+    \vspace*{1cm}
+\end{titlepage}
+
+\pagestyle{fancy}
+
+\tableofcontents
+
+\newpage
+
+\section{Introduction}
+%\addcontentsline{toc}{section}{Introduction}
+\markboth{Introduction}{}
+\input{intro}
+\newpage
+
+\pagenumbering{arabic}
+
+\section{Architecture}
+%\addcontentsline{toc}{section}{Théorie}
+\markboth{Architecture}{}
+\input{architecture}
+\newpage
+
+\section{Conclusion}
+%\addcontentsline{toc}{section}{Conclusion}
+\markboth{Conclusion}{}
+\input{concl}
+
+\end{document}
